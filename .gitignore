@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 前端构建产物
+dist/
+dist-ssr/
+*.local
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+src-tauri/resources/7z.exe
+
+# 编辑器
+.vscode/
+.idea/
+*.suo
+*.user
+
+# 系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+#other
+html/
+othertools/

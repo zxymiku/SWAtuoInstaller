@@ -1,0 +1,159 @@
+/* ==========================================================================
+   Ark UI — endfield 风格族设计令牌
+   --------------------------------------------------------------------------
+   家庭（family）：endfield —— 白 / 炭黑 / 信号黄的技术场域系统
+   深度（depth） ：maximal —— 展示级逐屏编排、状态驱动仪表
+
+   约定：
+     · 家族变量由 [data-ark-theme="endfield"] 拥有（墨色、纸色、信号色、字型、几何性格）
+     · 深度变量由 [data-ark-depth="maximal"] 拥有（层数、不透明度、动效可用性、装饰显隐）
+     · 组件选择器一律只用语义变量，不写死具体色值
+   ========================================================================== */
+
+[data-ark-theme='endfield'] {
+  /* ---------- 核心色板 ---------- */
+  --ark-ink: #191919;
+  --ark-ink-soft: #2c2c2c;
+  --ark-ink-mute: #4a4a48;
+  --ark-paper: #f2f2f0;
+  --ark-paper-warm: #e8e6e0;
+  --ark-paper-deep: #dcdad2;
+  --ark-accent: #fff500;
+  --ark-accent-dim: #b89b00;
+  --ark-accent-wash: rgb(255 245 0 / 18%);
+  --ark-border: #d0ccc4;
+  --ark-line-guide: #c0bbb0;
+  --ark-state-ok: #00a878;
+  --ark-state-warn: #c47f00;
+  --ark-state-error: #b3261e;
+  --ark-muted: #888888;
+
+  /* 深色器械面板（炭黑坞站） */
+  --ark-dock: #191919;
+  --ark-dock-raised: #232322;
+  --ark-dock-text: #f2f2f0;
+  --ark-dock-muted: rgb(242 242 240 / 54%);
+  --ark-dock-rule: rgb(242 242 240 / 16%);
+
+  /* 墨色半透明覆盖（替换「玻璃白卡片」） */
+  --ark-scrim: rgb(25 25 25 / 88%);
+  --ark-scrim-soft: rgb(25 25 25 / 62%);
+  --ark-on-scrim: #f2f2f0;
+  --ark-on-scrim-muted: rgb(242 242 240 / 62%);
+
+  /* ---------- 几何 ---------- */
+  --ark-radius: 0px;
+  --ark-radius-functional: 2px;
+  --ark-rule: 1px;
+  --ark-rail: 76px;
+  --ark-topbar: 60px;
+  --ark-bottom-rail: 0px;
+
+  /* ---------- 间距 ---------- */
+  --ark-space-xs: 4px;
+  --ark-space-sm: 8px;
+  --ark-space-md: 16px;
+  --ark-space-lg: 32px;
+  --ark-space-xl: 64px;
+  --ark-space-2xl: 96px;
+
+  /* ---------- 字型 ---------- */
+  --ark-font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
+  --ark-font-sans: 'Inter', 'Space Grotesk', 'Noto Sans SC', 'Source Han Sans SC',
+    'PingFang SC', system-ui, sans-serif;
+  --ark-font-display: 'Arial Narrow', 'Roboto Condensed', 'DIN Condensed', 'Inter',
+    'Noto Sans SC', sans-serif;
+  --ark-font-size-micro: 10px;
+  --ark-font-size-label: 11px;
+  --ark-font-size-body: 14px;
+  --ark-font-size-lead: 16px;
+  --ark-font-size-heading: 20px;
+  --ark-font-size-title: 32px;
+  --ark-font-size-display: 48px;
+  --ark-font-size-numeral: 72px;
+
+  /* ---------- 动效（家族性格：黄色擦入 + 方向性裁剪揭示） ---------- */
+  --ark-ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --ark-motion-direct: 240ms;
+  --ark-motion-reveal: 650ms;
+  --ark-motion-attention: 1800ms;
+  --ark-motion-distance: 10px;
+}
+
+/* ==========================================================================
+   深度：maximal —— 4~6 层协同舞台、状态驱动仪表、逐屏编排
+   ========================================================================== */
+
+[data-ark-depth='maximal'] {
+  --ark-stage-grid-opacity: 0.5;
+  --ark-stage-guide-opacity: 0.9;
+  --ark-stage-wedge-opacity: 1;
+  --ark-stage-calibration-opacity: 1;
+  --ark-stage-scan-opacity: 0.5;
+  --ark-track-opacity: 1;
+  --ark-instrument-shadow: 14px 14px 0 rgb(255 245 0 / 22%);
+  --ark-motion-distance: 14px;
+  --ark-orchestration: 1;
+}
+
+[data-ark-depth='complex'] {
+  --ark-stage-grid-opacity: 0.4;
+  --ark-stage-guide-opacity: 0.7;
+  --ark-stage-wedge-opacity: 0.7;
+  --ark-stage-calibration-opacity: 0.6;
+  --ark-stage-scan-opacity: 0;
+  --ark-track-opacity: 0.8;
+  --ark-instrument-shadow: 8px 8px 0 rgb(255 245 0 / 16%);
+  --ark-orchestration: 0.7;
+}
+
+[data-ark-depth='moderate'] {
+  --ark-stage-grid-opacity: 0.25;
+  --ark-stage-guide-opacity: 0.35;
+  --ark-stage-wedge-opacity: 0.35;
+  --ark-stage-calibration-opacity: 0;
+  --ark-stage-scan-opacity: 0;
+  --ark-track-opacity: 0.6;
+  --ark-instrument-shadow: none;
+  --ark-motion-distance: 4px;
+  --ark-orchestration: 0.4;
+}
+
+[data-ark-depth='minimal'] {
+  --ark-stage-grid-opacity: 0.12;
+  --ark-stage-guide-opacity: 0;
+  --ark-stage-wedge-opacity: 0;
+  --ark-stage-calibration-opacity: 0;
+  --ark-stage-scan-opacity: 0;
+  --ark-track-opacity: 0;
+  --ark-instrument-shadow: none;
+  --ark-motion-distance: 0px;
+  --ark-orchestration: 0.15;
+}
+
+/* 语义状态色（步骤 / 日志 / 服务状态共用一套映射） */
+[data-ark-theme='endfield'] {
+  --ark-level-trace: #8a8a86;
+  --ark-level-debug: #6f6f6a;
+  --ark-level-info: #2c2c2c;
+  --ark-level-warn: #a86a00;
+  --ark-level-error: #b3261e;
+  --ark-level-success: #00785a;
+
+  /* 提示条底色：由状态色与纸面混合得到的低饱和洗色，
+     供提示/错误条统一取用，避免在组件里散落字面色值 */
+  --ark-warn-wash: rgb(196 127 0 / 10%);
+  --ark-error-wash: rgb(179 38 30 / 8%);
+  --ark-ok-wash: rgb(0 120 90 / 7%);
+  --ark-sunk-input: #fbfbf9;
+  --ark-row-stripe: rgb(25 25 25 / 3%);
+}
+
+/* 高对比偏好：加深信号色边框，避免黄色在白底上失去可辨性 */
+@media (prefers-contrast: more) {
+  [data-ark-theme='endfield'] {
+    --ark-border: #8f8b83;
+    --ark-line-guide: #6d6960;
+    --ark-accent-dim: #866f00;
+  }
+}

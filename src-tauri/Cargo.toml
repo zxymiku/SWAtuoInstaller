@@ -1,0 +1,77 @@
+[package]
+name = "solidworks-installer"
+version = "1.0.0"
+description = "SolidWorks 2024 SP5 自动安装程序"
+authors = ["SolidWorks Installer Contributors"]
+edition = "2021"
+rust-version = "1.77"
+license = "MIT"
+repository = ""
+default-run = "solidworks-installer"
+
+[lib]
+# Tauri 2 约定：逻辑放在 lib，main.rs 只是薄壳。
+name = "solidworks_installer_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = { version = "0.8", features = ["preserve_order"] }
+toml_edit = "0.22"
+reqwest = { version = "0.12", default-features = false, features = [
+    "stream",
+    "blocking",
+    "native-tls",
+    "http2",
+    "charset",
+] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-util", "sync", "time"] }
+futures-util = "0.3"
+sha2 = "0.10"
+regex = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+
+[target.'cfg(windows)'.dependencies]
+# 与 tauri 2.11 使用同一主版本，避免重复引入两套 windows crate。
+windows = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_Globalization",
+  "Win32_System_Threading",
+  "Win32_System_ProcessStatus",
+  "Win32_System_Diagnostics_ToolHelp",
+  "Win32_System_SystemInformation",
+  "Win32_System_WindowsProgramming",
+  "Win32_System_Environment",
+  "Win32_System_Registry",
+  "Win32_System_Services",
+  "Win32_System_Com",
+  "Win32_System_Ole",
+  "Win32_System_LibraryLoader",
+  "Win32_Storage_FileSystem",
+  "Win32_Security",
+  "Win32_Networking_WinSock",
+  "Win32_NetworkManagement_Ndis",
+  "Win32_NetworkManagement_IpHelper",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_Shell",
+  "Win32_UI_Shell_Common",
+  "Win32_UI_Controls",
+] }
+
+[features]
+default = []
+# `tauri build --release` 会注入该特性，用于把前端资源编译进二进制。
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+# 保留 unwind：安装编排依赖 `catch_unwind` + `Drop` 守卫来恢复网络与卸载镜像，
+# `panic = "abort"` 会让 panic 直接终止进程而跳过所有守卫，因此不启用。
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

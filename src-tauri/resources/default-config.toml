@@ -1,0 +1,150 @@
+# ============================================================
+# SolidWorks 2024 SP5 自动安装程序 — 默认配置文件
+# 所有时间参数单位为分钟（float 类型，0.5 = 30 秒）
+# 该文件通过 include_str! 嵌入二进制，作为合并基线。
+# ============================================================
+
+[general]
+language = "zh-CN"                   # 界面语言: zh-CN / en-US
+theme = "endfield"                   # 界面风格: endfield
+
+# ---------- 下载配置 ----------
+[download]
+url = "https://example.com/solidworks2024sp5.7z"   # ← 改成你自己的下载地址
+threads = 32                         # **每个文件**的下载线程数，范围 1~255
+concurrent_files = 4                 # **同时下载几个文件**，范围 1~32（两者相乘 = 峰值连接数）
+probe_filenames = true               # 下载前用 HEAD 探测真实文件名（网盘直链务必保持 true）
+checksum_sha256 = ""                 # SHA-256 校验值，留空则跳过（分片模式下不生效）
+retry_count = 3                      # 下载失败重试次数
+retry_backoff_minutes = 0.5          # 重试间隔基数（指数退避）
+connect_timeout_minutes = 1          # 连接超时
+read_timeout_minutes = 5             # 读取超时
+
+# ---------- 分片下载（可选） ----------
+# 每个分片一个 URL，每行一个，数量不限。非空时进入分片模式：
+# 各片**并发**下载到同一目录，文件名**先解析成真实名**（剥掉 .aspx 这类假后缀），
+# 最后把 .001 交给 7z —— 7z / NanaZip 的分卷会被整套自动识别，不要拼接。
+# 留空则使用上面的 url 单包模式。
+multipart_urls = []
+multipart_concat = false             # 仅"非标准切分"时才设为 true
+
+# ---------- 远程配置 ----------
+[remote_config]
+url = "https://example.com/config.toml"  # ← 改成你的远程配置地址
+auto_fetch_on_start = false          # 启动时自动拉取
+fetch_timeout_minutes = 1            # 拉取超时
+
+# ---------- 安装配置 ----------
+[install]
+install_drive = "C"                  # 目标盘符: C / D / E ...
+# 安装路径 → MSI 属性 INSTALLDIR（**原样传入，不追加层级**）。
+# INSTALLDIR 是"产品系列根"，MSI 自己会在下面建 SOLIDWORKS\ 子目录。
+# 实测确认的落点关系：
+#   INSTALLDIR = D:\SW  →  D:\SW\SOLIDWORKS\SLDWORKS.exe（主程序本体）
+#                           D:\SW\SOLIDWORKS\lang\chinese-simplified\（中文资源）
+#                           D:\SW\SOLIDWORKS\Toolbox\（Toolbox）
+# 留空则用 {install_drive}:\SW
+install_path = ""
+# 目标组件：SOLIDWORKS 主程序 + Toolbox。Feature 名区分大小写。
+# 写法取自官方手册《命令行特征属性》：
+#   ADDLOCAL=SolidWorks, SolidWorksToolbox
+# （实测 MSI 里 SolidWorksToolbox 的父级是 AddIns，但 AddIns 带
+#  UIDISALLOWED 属性、界面上不可选，因此不在官方清单里；
+#  Windows Installer 会按需自动补装父级。）
+components_whitelist = ["SolidWorks", "SolidWorksToolbox"]
+# 必须为 true：走 startswinstall 时命令行不接受组件列表，白名单会被静默忽略。
+force_msiexec = true
+install_switches = []                # 追加给 startswinstall.exe 的额外开关，例如 ["/l","C:\\sw.log"]
+serial_number = ""                   # 序列号 → MSI 属性 SOLIDWORKSSERIALNUMBER（官方属性名）
+# Toolbox 数据目录 → 官方属性 TOOLBOXFOLDER。
+# 默认值刻意不含空格：含空格的值若引号处理不当会让 msiexec 报 1639
+# 并弹出用法对话框（安装完全不执行）。
+toolbox_folder = "C:\\SOLIDWORKS_Data"
+# 语言包：对应介质 swwi\lang\<名称>\<名称>.msi。
+# 语言包是**独立的 MSI**，官方要求单独安装；留空则跳过。
+# 可用值 = 介质 swwi\lang\ 下的目录名：
+#   chinese(繁体1028) / chinese-simplified(简体2052) / czech / french / german /
+#   italian / japanese / korean / polish / portuguese-brazilian / russian /
+#   spanish / turkish
+language_pack = "chinese-simplified"
+# 兼容旧配置。语言包会在主程序 MSI 的具体进程退出后立即启动。
+language_pack_delay_minutes = 0
+
+# ---------- Windows 前置组件 ----------
+# 官方手册明确：**命令行安装不会自动装前置组件**
+# （.NET 4.8 / Visual C++ 可再发行 / WebView2 / VBA）。
+# 缺失的后果是"装上了却跑不起来"——solidworks.msi 没有 LaunchCondition 表，
+# 安装会报成功，直到启动主程序缺 DLL 才暴露。
+install_prerequisites = true         # 检测缺失项并从介质 PreReqs\ 安装
+prerequisite_timeout_minutes = 20    # 单个前置组件安装超时（.NET 包有 112 MB）
+
+# ---------- 轮询检测 ----------
+[install.polling]
+poll_interval_minutes = 0.5          # 轮询间隔（30 秒）
+timeout_minutes = 240                # 最长等待（4 小时）
+log_check_enabled = true             # 检查安装日志
+process_check_enabled = true         # 检查安装进程是否退出
+file_check_enabled = true            # 检查 SOLIDWORKS.exe 是否生成
+
+# ---------- 弹窗处理 ----------
+[install.popup]
+scan_interval_ms = 500               # 窗口扫描间隔（毫秒）
+auto_click_confirm = true            # 自动点击"确定"
+auto_click_yes = true                # 自动点击"是"
+auto_click_no = false                # 不自动点击"否"
+popup_timeout_minutes = 5            # 单个弹窗等待超时
+
+# ---------- 网络管理 ----------
+[network]
+disable_network = true               # 安装期间禁用网络
+restore_network_after = true         # 安装后恢复网络
+adapter_disable_method = "netsh"     # "netsh" 或 "powershell"
+
+# ---------- 进程管理 ----------
+[process]
+kill_sw_processes = true
+# 关键词（正则，不区分大小写，首尾空白自动忽略）。写纯关键词即可。
+# ← 按你的环境增删关键词；空值会被拒绝以免误杀全部进程。
+kill_pattern = ".*solidwork.*|.*sldworks.*|.*sw_dn.*|.*sidworks.*|.*flexnet.*|.*lmgrd.*"
+match_command_line = true            # 是否同时匹配进程路径与命令行（更慢但更全）
+kill_timeout_minutes = 2             # 优雅退出等待时间
+force_kill_after_timeout = true      # 超时后强制终止
+
+# ---------- FlexNet 服务 ----------
+[flexnet]
+server_install_timeout_minutes = 5   # 等待 server_install.bat 完成的最长时间
+server_check_interval_minutes = 0.5  # 服务状态轮询间隔
+remove_old_server_first = true       # 是否先运行 server_remove.bat
+
+# ---------- 工作目录 ----------
+[workdir]
+cleanup_temp_after = true            # 安装完成后清理临时文件
+temp_dir = ""                        # 临时目录，留空则用系统默认
+
+# ---------- 7z 解压 ----------
+[sevenzip]
+exe_path = ""                        # 7z.exe 路径，留空则自动查找
+extract_timeout_minutes = 30         # 单次解压超时
+auto_download = true                 # 找不到 7z 时自动从 download_url 获取
+download_url = "https://github.com/ip7z/7zip/releases/latest/download/7zr.exe"
+download_timeout_minutes = 3         # 自动下载超时
+
+# ---------- 安全软件处置 ----------
+# Windows Defender 与多数第三方杀软会把 _SolidSQUAD_ 里的补丁判为威胁并删除，
+# 导致安装走到「文件替换」时缺少源文件。因此本阶段在**解压之前**执行。
+[antivirus]
+enabled = true                       # 是否启用本阶段
+detect = true                        # 是否用 SecurityCenter2 检测并告知用户
+remove_defender = true               # 是否移除 Windows Defender
+# windows-defender-remover 的 script 目录（含 PowerRun.exe 与 RemoveSecHealthApp.ps1）。
+# 留空则自动查找：配置 → exe 同级的 othertools\... → 资源目录 → 源码目录
+defender_tool_path = ""
+# 删除 Defender 后提示「必须重启」。本程序不会自动重启，也不会因此中断安装。
+warn_reboot_after_removal = true
+# 第三方杀软处置方式：
+#   prompt    只检测并提示用户手动从托盘退出
+#   terminate 额外终止其进程 / 停止其服务
+#   uninstall 再额外尝试按其 UninstallString 静默卸载
+third_party_mode = "terminate"
+settle_minutes = 0.5                 # 处置后等待生效的时间
+command_timeout_minutes = 5          # 单条处置命令超时
